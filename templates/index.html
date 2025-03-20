@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 手機展示平台</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>3D 手機展示平台</h1>
+    </header>
+    
+    <div class="main-container">
+        <div id="phone-nav" class="nav-container">
+            <!-- 手機型號選單將由JavaScript動態產生 -->
+        </div>
+        
+        <div id="container" class="phone-viewer"></div>
+        
+        <div id="info-container" class="info-panel">
+            <!-- 手機資訊將由JavaScript動態產生 -->
+        </div>
+    </div>
+    
+    <div id="controls" class="control-panel">
+        <button id="rotate-left" class="control-btn" title="向左旋轉">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <button id="zoom-out" class="control-btn" title="縮小">
+            <i class="fas fa-search-minus"></i>
+        </button>
+        <button id="auto-rotate" class="control-btn" title="自動旋轉">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <button id="zoom-in" class="control-btn" title="放大">
+            <i class="fas fa-search-plus"></i>
+        </button>
+        <button id="rotate-right" class="control-btn" title="向右旋轉">
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+    
+    <footer>
+        <p>© 2023 3D手機展示平台 - 依照SPEC.md實作</p>
+    </footer>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+            "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/loaders/GLTFLoader.js",
+            "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/controls/OrbitControls.js"
+        }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

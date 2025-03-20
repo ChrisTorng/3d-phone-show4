@@ -1,0 +1,35 @@
+[
+    {
+        "id": "iphone_16_pro_max",
+        "name": "iPhone 16 Pro Max",
+        "screen": "6.9 inch OLED",
+        "processor": "Apple A18 Pro",
+        "camera": "108MP 主鏡頭 + 48MP 超廣角 + 12MP 望遠",
+        "battery": "4685 mAh",
+        "storage": "256 GB / 512 GB / 1 TB",
+        "model_path": "models/iphone_16_pro_max.glb",
+        "special_features": "動態島、光學變焦、ProMotion 120Hz 螢幕"
+    },
+    {
+        "id": "samsung_galaxy_s22_ultra",
+        "name": "Samsung Galaxy S22 Ultra",
+        "screen": "6.8 inch Dynamic AMOLED 2X",
+        "processor": "Qualcomm Snapdragon 8 Gen 1",
+        "camera": "108MP 主鏡頭 + 12MP 超廣角 + 10MP 望遠 + 10MP 潛望式鏡頭",
+        "battery": "5000 mAh",
+        "storage": "128 GB / 256 GB / 512 GB / 1 TB",
+        "model_path": "models/samsung_galaxy_s22_ultra.glb",
+        "special_features": "S Pen 支援、100倍空間變焦、45W 快速充電"
+    },
+    {
+        "id": "samsung_galaxy_z_flip_3",
+        "name": "Samsung Galaxy Z Flip 3",
+        "screen": "6.7 inch 主螢幕 + 1.9 inch 外螢幕",
+        "processor": "Qualcomm Snapdragon 888",
+        "camera": "12MP 主鏡頭 + 12MP 超廣角",
+        "battery": "3300 mAh",
+        "storage": "128 GB / 256 GB",
+        "model_path": "models/Samsung_Galaxy_Z_Flip_3.glb",
+        "special_features": "折疊螢幕、IPX8 防水、無線充電"
+    }
+]
