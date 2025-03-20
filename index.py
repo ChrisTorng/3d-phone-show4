@@ -3,16 +3,32 @@ import os
 import json
 from werkzeug.utils import secure_filename
 import logging
+import sys
+
+# 判斷是否為開發環境
+is_development = __name__ == '__main__' or os.environ.get('FLASK_ENV') == 'development'
 
 # 設定日誌記錄
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler()
-    ]
-)
+if is_development:
+    # 開發環境：輸出到檔案和控制台
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler("app.log"),
+            logging.StreamHandler()
+        ]
+    )
+else:
+    # 生產環境：完全不輸出日誌
+    logging.basicConfig(
+        level=logging.CRITICAL,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.NullHandler()
+        ]
+    )
+
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
