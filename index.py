@@ -108,6 +108,21 @@ def load_phones_data():
 
 # 處理路徑遍歷嘗試
 def safe_path_join(base, path):
+    # 處理常見靜態資源的特殊情況
+    if path.endswith(('.css', '.js', '.html', '.png', '.jpg', '.jpeg', '.gif', '.glb')):
+        # 對靜態資源使用專案根目錄
+        project_root = os.path.dirname(__file__)
+        full_path = os.path.normpath(os.path.join(project_root, path))
+        if os.path.exists(full_path):
+            return full_path
+    
+        # 特別針對 .glb 檔案在 models 目錄中進行第二次檢查
+        if path.endswith('.glb'):
+            model_path = os.path.normpath(os.path.join(MODELS_PATH, os.path.basename(path)))
+            if os.path.exists(model_path):
+                return model_path
+
+    # 原有的安全檢查邏輯
     path = secure_filename(path)
     full_path = os.path.normpath(os.path.join(base, path))
     
