@@ -8,7 +8,7 @@
 - 確保已安裝 Python 3.7+
 - 確保瀏覽器支援 WebGL
 - 安裝所有相依套件：`pip install -r requirements.txt`
-- 安裝測試相依套件：`pip install pytest selenium`
+- 安裝測試相依套件：`pip install pytest playwright`
 
 ### 1.2 測試環境
 - **本地測試環境**：執行 `python index.py`，訪問 `http://localhost:5000`

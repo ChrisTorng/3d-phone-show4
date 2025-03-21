@@ -1,0 +1,76 @@
+name: 測試套件
+on: [push, pull_request]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 檢出程式碼
+        uses: actions/checkout@v2
+      
+      - name: 設定 Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      - name: 安裝相依套件
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      
+      - name: 執行後端測試
+        run: |
+          pytest tests/test_backend.py tests/test_api_integration.py -v --cov=app
+      
+      - name: 上傳測試覆蓋率報告
+        uses: codecov/codecov-action@v2
+  
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 檢出程式碼
+        uses: actions/checkout@v2
+      
+      - name: 設定 Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      
+      - name: 安裝相依套件
+        run: |
+          npm ci
+      
+      - name: 執行前端測試
+        run: |
+          npm test
+  
+  browser-compatibility:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 檢出程式碼
+        uses: actions/checkout@v2
+      
+      - name: 設定 Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      - name: 安裝相依套件
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest playwright
+          playwright install
+      
+      - name: 啟動測試伺服器
+        run: |
+          python index.py &
+          sleep 5  # 給伺服器啟動的時間
+      
+      - name: 執行瀏覽器相容性測試
+        run: |
+          pytest tests/test_browser_compatibility.py -v

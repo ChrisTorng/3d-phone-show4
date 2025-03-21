@@ -3,5 +3,10 @@
         {
             "file": ".github/codeGeneration-instructions.md"
         }
-    ]
+    ],
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
