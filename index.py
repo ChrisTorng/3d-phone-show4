@@ -39,6 +39,7 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), 'data')
 MODELS_PATH = os.path.join(os.path.dirname(__file__), 'models')
 DB_PATH = os.path.join(DATA_PATH, 'phones.db')
 SQL_INIT_PATH = os.path.join(DATA_PATH, 'database.sql')
+JSON_PATH = os.path.join(DATA_PATH, 'phones.json')
 
 # 確保資料目錄存在
 if not os.path.exists(DATA_PATH):
@@ -46,43 +47,6 @@ if not os.path.exists(DATA_PATH):
         os.makedirs(DATA_PATH)
     except Exception as e:
         logger.error(f"無法建立資料目錄: {e}")
-
-# 預設手機資料
-DEFAULT_PHONES = [
-    {
-        'id': 'iphone_16_pro_max',
-        'name': 'iPhone 16 Pro Max!',
-        'screen': '6.9 inch OLED',
-        'processor': 'Apple A18 Pro',
-        'camera': '108MP 主鏡頭 + 48MP 超廣角 + 12MP 望遠',
-        'battery': '4685 mAh',
-        'storage': '256 GB / 512 GB / 1 TB',
-        'model_path': 'models/iphone_16_pro_max.glb',
-        'special_features': '動態島、光學變焦、ProMotion 120Hz 螢幕'
-    },
-    {
-        'id': 'samsung_galaxy_s22_ultra',
-        'name': 'Samsung Galaxy S22 Ultra',
-        'screen': '6.8 inch Dynamic AMOLED 2X',
-        'processor': 'Qualcomm Snapdragon 8 Gen 1',
-        'camera': '108MP 主鏡頭 + 12MP 超廣角 + 10MP 望遠 + 10MP 潛望式鏡頭',
-        'battery': '5000 mAh',
-        'storage': '128 GB / 256 GB / 512 GB / 1 TB',
-        'model_path': 'models/samsung_galaxy_s22_ultra.glb',
-        'special_features': 'S Pen 支援、100倍空間變焦、45W 快速充電'
-    },
-    {
-        'id': 'samsung_galaxy_z_flip_3',
-        'name': 'Samsung Galaxy Z Flip 3',
-        'screen': '6.7 inch 主螢幕 + 1.9 inch 外螢幕',
-        'processor': 'Qualcomm Snapdragon 888',
-        'camera': '12MP 主鏡頭 + 12MP 超廣角',
-        'battery': '3300 mAh',
-        'storage': '128 GB / 256 GB',
-        'model_path': 'models/Samsung_Galaxy_Z_Flip_3.glb',
-        'special_features': '折疊螢幕、IPX8 防水、無線充電'
-    }
-]
 
 # 資料庫連線函式
 def get_db_connection():
@@ -95,14 +59,23 @@ def get_db_connection():
         logger.error(f"資料庫連線錯誤: {e}")
         return None
 
+def get_default_phones():
+    """從 JSON 檔案讀取預設手機資料"""
+    try:
+        if os.path.exists(JSON_PATH):
+            with open(JSON_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        logger.error(f"讀取預設手機資料檔案錯誤: {e}")
+    return []
+
 # 初始化資料庫
 def init_database():
     """從 SQL 檔案初始化資料庫結構和資料"""
     try:
-        # 檢查 SQL 檔案是否存在
         if not os.path.exists(SQL_INIT_PATH):
-            # 如果 SQL 檔案不存在，建立預設 SQL 檔案
-            create_default_sql_file()
+            logger.error("找不到資料庫初始化檔案")
+            return
             
         conn = get_db_connection()
         if conn:
@@ -113,12 +86,10 @@ def init_database():
             logger.info("資料庫初始化完成")
     except Exception as e:
         logger.error(f"資料庫初始化錯誤: {e}")
-        # 如果初始化失敗，嘗試使用程式碼直接建立表格和插入資料
-        create_db_from_default_data()
 
 # 從預設資料建立資料庫
 def create_db_from_default_data():
-    """當 SQL 檔案不可用時，直接使用程式碼建立資料表和插入資料"""
+    """當 SQL 檔案不可用時，從 JSON 檔案建立資料庫"""
     try:
         conn = get_db_connection()
         if conn:
@@ -140,85 +111,27 @@ def create_db_from_default_data():
             # 清除現有資料
             conn.execute('DELETE FROM phones')
             
-            # 插入預設資料
-            for phone in DEFAULT_PHONES:
-                conn.execute('''
-                INSERT INTO phones (id, name, screen, processor, camera, battery, storage, model_path, special_features)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    phone['id'], phone['name'], phone['screen'], phone['processor'], 
-                    phone['camera'], phone['battery'], phone['storage'], 
-                    phone['model_path'], phone['special_features']
-                ))
+            # 從 JSON 檔案讀取並插入預設資料
+            default_phones = get_default_phones()
+            if default_phones:
+                for phone in default_phones:
+                    conn.execute('''
+                    INSERT INTO phones (id, name, screen, processor, camera, battery, storage, model_path, special_features)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (
+                        phone['id'], phone['name'], phone['screen'], phone['processor'], 
+                        phone['camera'], phone['battery'], phone['storage'], 
+                        phone['model_path'], phone['special_features']
+                    ))
+                
+                conn.commit()
+                logger.info("從 JSON 檔案建立資料庫完成")
+            else:
+                logger.error("無法讀取預設資料")
             
-            conn.commit()
             conn.close()
-            logger.info("直接從程式碼建立資料庫完成")
     except Exception as e:
         logger.error(f"直接建立資料庫錯誤: {e}")
-
-# 建立預設 SQL 檔案
-def create_default_sql_file():
-    """建立預設的 SQL 初始化檔案"""
-    try:
-        sql_content = '''-- 建立手機資料表
-CREATE TABLE IF NOT EXISTS phones (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    screen TEXT NOT NULL,
-    processor TEXT NOT NULL,
-    camera TEXT NOT NULL,
-    battery TEXT NOT NULL,
-    storage TEXT NOT NULL,
-    model_path TEXT NOT NULL,
-    special_features TEXT NOT NULL
-);
-
--- 刪除現有資料以避免重複
-DELETE FROM phones;
-
--- 插入手機資料
-INSERT INTO phones (id, name, screen, processor, camera, battery, storage, model_path, special_features)
-VALUES 
-    (
-        'iphone_16_pro_max',
-        'iPhone 16 Pro Max',
-        '6.9 inch OLED',
-        'Apple A18 Pro',
-        '108MP 主鏡頭 + 48MP 超廣角 + 12MP 望遠',
-        '4685 mAh',
-        '256 GB / 512 GB / 1 TB',
-        'models/iphone_16_pro_max.glb',
-        '動態島、光學變焦、ProMotion 120Hz 螢幕'
-    ),
-    (
-        'samsung_galaxy_s22_ultra',
-        'Samsung Galaxy S22 Ultra',
-        '6.8 inch Dynamic AMOLED 2X',
-        'Qualcomm Snapdragon 8 Gen 1',
-        '108MP 主鏡頭 + 12MP 超廣角 + 10MP 望遠 + 10MP 潛望式鏡頭',
-        '5000 mAh',
-        '128 GB / 256 GB / 512 GB / 1 TB',
-        'models/samsung_galaxy_s22_ultra.glb',
-        'S Pen 支援、100倍空間變焦、45W 快速充電'
-    ),
-    (
-        'samsung_galaxy_z_flip_3',
-        'Samsung Galaxy Z Flip 3',
-        '6.7 inch 主螢幕 + 1.9 inch 外螢幕',
-        'Qualcomm Snapdragon 888',
-        '12MP 主鏡頭 + 12MP 超廣角',
-        '3300 mAh',
-        '128 GB / 256 GB',
-        'models/Samsung_Galaxy_Z_Flip_3.glb',
-        '折疊螢幕、IPX8 防水、無線充電'
-    );
-'''
-        with open(SQL_INIT_PATH, 'w', encoding='utf-8') as f:
-            f.write(sql_content)
-        logger.info("已建立預設 SQL 初始化檔案")
-    except Exception as e:
-        logger.error(f"建立預設 SQL 檔案錯誤: {e}")
 
 # 從資料庫讀取手機資料
 def load_phones_data():
@@ -239,13 +152,13 @@ def load_phones_data():
             cursor = conn.execute('SELECT * FROM phones')
             phones = [dict(row) for row in cursor.fetchall()]
             conn.close()
-            return phones if phones else DEFAULT_PHONES
+            return phones if phones else get_default_phones()
         
-        # 若仍然失敗，返回預設資料
-        return DEFAULT_PHONES
+        # 若仍然失敗，返回從 JSON 讀取的預設資料
+        return get_default_phones()
     except Exception as e:
         logger.error(f"讀取手機資料時發生錯誤: {e}")
-        return DEFAULT_PHONES
+        return get_default_phones()
 
 # 保存手機資料到 JSON (為向後相容保留此函式)
 def save_default_data():
@@ -254,7 +167,7 @@ def save_default_data():
         phones_file = os.path.join(DATA_PATH, 'phones.json')
         if not os.path.exists(phones_file):
             with open(phones_file, 'w', encoding='utf-8') as f:
-                json.dump(DEFAULT_PHONES, f, ensure_ascii=False, indent=4)
+                json.dump(get_default_phones(), f, ensure_ascii=False, indent=4)
             logger.info("已建立預設手機資料文件")
     except Exception as e:
         logger.error(f"保存預設資料時發生錯誤: {e}")
