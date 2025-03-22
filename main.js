@@ -221,12 +221,22 @@ class PhoneViewer {
         
         const currentModel = this.phoneModels[this.currentModelIndex].scene;
         const rotateSpeed = 0.3;
+        const targetRotation = direction === 'left' ? currentModel.rotation.y + rotateSpeed : currentModel.rotation.y - rotateSpeed;
         
-        if (direction === 'left') {
-            currentModel.rotation.y += rotateSpeed;
-        } else if (direction === 'right') {
-            currentModel.rotation.y -= rotateSpeed;
-        }
+        // 使用動畫過渡效果
+        const animateRotation = () => {
+            requestAnimationFrame(animateRotation);
+            const rotationStep = 0.01;
+            if (direction === 'left' && currentModel.rotation.y < targetRotation) {
+                currentModel.rotation.y = Math.min(currentModel.rotation.y + rotationStep, targetRotation);
+            } else if (direction === 'right' && currentModel.rotation.y > targetRotation) {
+                currentModel.rotation.y = Math.max(currentModel.rotation.y - rotationStep, targetRotation);
+            } else {
+                return; // 結束動畫
+            }
+        };
+        
+        animateRotation();
     }
     
     /**
@@ -392,7 +402,7 @@ class PhoneViewer {
         // 計算模型包圍盒以調整大小
         const box = new THREE.Box3().setFromObject(modelScene);
         const size = box.getSize(new THREE.Vector3()).length();
-        const scaleFactor = 2 / size;
+        const scaleFactor = 6 / size;
         
         modelScene.scale.set(scaleFactor, scaleFactor, scaleFactor);
         
