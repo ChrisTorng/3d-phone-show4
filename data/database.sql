@@ -19,7 +19,7 @@ INSERT INTO phones (id, name, screen, processor, camera, battery, storage, model
 VALUES 
     (
         'iphone_16_pro_max',
-        'iPhone 16 Pro Max',
+        'iPhone 16 Pro Max!!',
         '6.9 inch OLED',
         'Apple A18 Pro',
         '108MP 主鏡頭 + 48MP 超廣角 + 12MP 望遠',
