@@ -8,5 +8,20 @@
         "."
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "mcp": {
+        "servers": {
+            "sqlite": {
+                "command": "uv",
+                "args": [
+                    "--directory",
+                    "D:/AI/MCP/sqlite",
+                    "run",
+                    "mcp-server-sqlite",
+                    "--db-path",
+                    "${workspaceFolder}/data/phones.db"
+                ]
+            }
+        }
+    }
 }
